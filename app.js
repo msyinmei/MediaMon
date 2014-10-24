@@ -44,16 +44,16 @@ passport.deserializeUser(function(id, done){
     });
 });
 
-
 //Home
 app.get('/', function(req, res){
   res.render('home');
 });
 
 //404
-app.get('*', function(req,res){
+app.get('*', function(req, res){
   res.render('404');
 });
+
 
 //3000
 app.listen(3000, function(){

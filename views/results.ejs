@@ -1,0 +1,25 @@
+<% include partials/header %>
+
+    <ul>
+      <!-- Loop over all the articles in articleList -->
+      <% articleList.forEach(function (article) {%>
+
+      <!-- Only show the results that are movies -->
+      <!-- (i.e., do not show TV shows) -->
+      <!-- Show the title and the imdbID -->
+
+      <div>
+      <li>    <a href="<%= article.url %>"> <%=article.title%> </a><br>
+              <%=article.date%> <%= article.source %>
+      </li>
+      <% if (article.imgurl !== undefined) {%>
+              <img src="<%= article.imgurl %>" alt="thumbnail">
+            <% } %>
+      </div>
+
+      <!-- Close the `forEach` -->
+      <% }) %>
+    </ul>
+
+
+<% include partials/footer %>

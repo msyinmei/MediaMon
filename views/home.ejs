@@ -1,16 +1,14 @@
 <% include partials/header %>
-<link rel="stylesheet" href="stylesheets/main.css">
+
+ <h1> Welcome to MediaMon! </h1>
+ <h2> Enjoy your media monitoring experience.</h2>
 
   <p>
-    Welcome to MediaMon! Enjoy your media monitoring experience.
-  </p>
-
-  <p>
-  <form action="">
-    <input type="search" value="Start Search">
-    <input type="submit" value="Go!">
+  <form action="/search" method="GET">
+    <div class="form-group" >
+      <input type="text" name="keyword" id="keyword" size="30" class="form-control" placeholder="Search">
+    </div>
   </form>
-
   </p>
 
 <% include partials/footer %>

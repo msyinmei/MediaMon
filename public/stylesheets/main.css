@@ -1,6 +1,25 @@
 .main {
-background-image: url('../images/applenews.jpg');
-height: 100vh;
+background-image: url('../images/paperbackground.jpg');
+background-position: top;
+max-width: 1400px;
+min-height: 100vh;
+height: 100%;
+font-family: 'Libre Baskerville', serif;
+}
+
+h1.masthead{
+  text-align: center;
+  margin: auto;
+}
+
+article{
+  color: #000000;
+  border: 2px solid;
+}
+
+a {
+  color: #000000;
+  text-decoration: underline;
 }
 
 .navbar-custom {

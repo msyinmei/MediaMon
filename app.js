@@ -97,7 +97,7 @@ app.get('/search', function(req, res){
                 articleTemp.date = article.pub_date;
                 articleTemp.summary = article.snippet;
                 articleTemp.source = article.source;
-                articleTemp.imgurl = "https://nytimes.com/" + (article.multimedia[0].url);
+                // articleTemp.imgurl = "https://nytimes.com/" + (article.multimedia[0].url);
                 console.log("MULTIMEDIA URL");
                 articleList.push(articleTemp);
               });

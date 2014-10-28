@@ -19,14 +19,35 @@
       <!-- Only show the results that are movies -->
       <!-- (i.e., do not show TV shows) -->
       <!-- Show the title and the imdbID -->
-      <div class="col-md-3 article">    <a href="<%= article.url %>"> <%=article.title%> </a><br>
-              <%=article.date%> <%= article.source %>
+      <div class="col-md-3 article">
+
+      <p><!-- Twitter button  -->
+      <a href="https://twitter.com/share"
+      class="twitter-share-button"
+      data-via="your_screen_name"
+      data-counturl="<%= article.url %>"
+      data-count="vertical"
+      data-text="<%= article.title %> by <%= article.twitter %>: <%= article.url %>"
+      data-related="twitterdev:Twitter Developer Relations"
+      >Tweet</a>
+      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+      </script><br>
+      <!-- end twitter button-->
+      <a href="<%= article.url %>"> <%=article.title%></a>
+
+
+             <br> <%=article.date%> <br> <%= article.source %>
+
               <% if (article.summary !== undefined) {%>
               <p>"<%= article.summary %>"</p>
             <% } %>
-      <% if (article.imgurl !== undefined) {%>
+
+<!--       <% if (article.imgurl !== undefined) {%>
               <img src="<%= article.imgurl %>" alt="thumbnail">
-            <% } %>
+            <% } %> -->
+
+
+      </p>
       </div>
       <!-- Close the `forEach` -->
       <% }) %>

@@ -17,10 +17,9 @@ article{
   border: 2px solid;
 }
 
-a {
+/*a {
   color: #000000;
-  text-decoration: underline;
-}
+}*/
 
 .navbar-custom {
     background:rgba(200,54,54,0.5);

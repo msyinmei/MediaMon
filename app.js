@@ -76,6 +76,7 @@ app.get('/search', function(req, res){
         articleTemp.url = article.webUrl;
         articleTemp.date = article.webPublicationDate;
         articleTemp.source = "The Guardian";
+        articleTemp.twitter = "@guardian";
         articleList.push(articleTemp);
       });
       console.log(articleList.length);
@@ -97,6 +98,7 @@ app.get('/search', function(req, res){
                 articleTemp.date = article.pub_date;
                 articleTemp.summary = article.snippet;
                 articleTemp.source = article.source;
+                articleTemp.twitter = "@nytimes";
                 // articleTemp.imgurl = "https://nytimes.com/" + (article.multimedia[0].url);
                 console.log("MULTIMEDIA URL");
                 articleList.push(articleTemp);

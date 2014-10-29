@@ -83,6 +83,38 @@ app.get('/home', function(req, res){
   }
 });
 
+var fetchFromNYT = function(searchTerm, articleList, success, error) {
+  var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + searchTerm + "&api-key=1878509ebcc1080b029ef031ea085599%3A0%3A70065346";
+
+  request(nytimesUrl, function(error, response, body){
+    console.log("NYTIMES SEARCH code:" + response.statusCode);
+
+    if (!error && response.statusCode === 200){
+      var nytimesResult = JSON.parse(body).response.docs;
+      //console.log(nytimesResult);
+      nytimesResult.forEach(function(article){
+              var articleTemp = {};
+              articleTemp.title = article.headline.main;
+              articleTemp.url = article.web_url;
+              articleTemp.date = article.pub_date;
+              articleTemp.summary = article.snippet;
+              articleTemp.source = article.source;
+              articleTemp.twitter = "@nytimes";
+              // articleTemp.imgurl = "https://nytimes.com/" + (article.multimedia[0].url);
+              console.log("nytimes article for" + searchTerm);
+              articleList.push(articleTemp);
+            });
+      console.log("articleList length:" + articleList.length);
+      console.log("nytimesResult length:" + nytimesResult.length);
+      console.log("articleList" + articleList);
+      console.log("NYTIMES SUCCESS");
+      //SORT articleList
+      success(articleList);
+    } else {
+      error();
+    }
+  });// request (the new york times)
+};
 
 //CREATE KEYWORD on SEARCH
 app.get('/search', function(req, res){
@@ -111,9 +143,10 @@ if (req.user){
         user.getKeywords().done(function(err, keywords){
           //Declare search term
           var searchTerm = null;
+          //Declare keyword list
+          var keywordList = keywords;
           //Declare variables for Search Results from APIs
           var articleList = [];
-          var keywordList = keywords;
 
           keywords.forEach(function(keyword){
             //assign new keyword to searchTerm
@@ -148,36 +181,12 @@ if (req.user){
                 console.log("GUARDIAN SUCCESS");
 
                 //call THe NY TIMES API searching for search query-related articles
-                request(nytimesUrl, function(error, response, body){
-                  console.log("NYTIMES SEARCH code:" + response.statusCode);
-
-                  if (!error && response.statusCode === 200){
-                    var nytimesResult = JSON.parse(body).response.docs;
-                    //console.log(nytimesResult);
-                    nytimesResult.forEach(function(article){
-                            articleTemp = {};
-                            articleTemp.title = article.headline.main;
-                            articleTemp.url = article.web_url;
-                            articleTemp.date = article.pub_date;
-                            articleTemp.summary = article.snippet;
-                            articleTemp.source = article.source;
-                            articleTemp.twitter = "@nytimes";
-                            // articleTemp.imgurl = "https://nytimes.com/" + (article.multimedia[0].url);
-                            console.log("nytimes article for" + searchTerm);
-                            articleList.push(articleTemp);
-                          });
-                    console.log("articleList length:" + articleList.length);
-                    console.log("guardianResult length:" + guardianResult.length);
-                    console.log("nytimesResult length:" + nytimesResult.length);
-                    console.log("articleList" + articleList);
-                    console.log("NYTIMES SUCCESS");
-                    //SORT articleList
-                    res.render("results", { articleList: articleList, user: req.user, keywordList: keywordList});
-                  } else {
-                    console.log("Hanging ...");
-                    res.redirect("/");
-                  }//inner if
-                });//second request (the new york times)
+                fetchFromNYT(searchTerm, articleList, function(articles){
+                  res.render("results", { articleList: articles, user: req.user, keywordList: keywordList});
+                }, function(){
+                  console.log("NYT Error");
+                  res.redirect("/");
+                });
               }//outer if
             });//first request(the guardian)
           });//Keywords forEach function
@@ -192,7 +201,6 @@ if (req.user){
       //assign new keyword to searchTerm
       var searchTerm = req.query.keyword;
       //Declare variables for Search Results from APIs
-
       var articleTemp = {};
       var articleList = [];
 
@@ -223,36 +231,12 @@ if (req.user){
           console.log("GUARDIAN SUCCESS");
 
           //call THe NY TIMES API searching for search query-related articles
-          request(nytimesUrl, function(error, response, body){
-            console.log("NYTIMES SEARCH code:" + response.statusCode);
-
-            if (!error && response.statusCode === 200){
-              var nytimesResult = JSON.parse(body).response.docs;
-              //console.log(nytimesResult);
-              nytimesResult.forEach(function(article){
-                      articleTemp = {};
-                      articleTemp.title = article.headline.main;
-                      articleTemp.url = article.web_url;
-                      articleTemp.date = article.pub_date;
-                      articleTemp.summary = article.snippet;
-                      articleTemp.source = article.source;
-                      articleTemp.twitter = "@nytimes";
-                      // articleTemp.imgurl = "https://nytimes.com/" + (article.multimedia[0].url);
-                      console.log("nytimes article for" + searchTerm);
-                      articleList.push(articleTemp);
-                    });
-              console.log("articleList length:" + articleList.length);
-              console.log("guardianResult length:" + guardianResult.length);
-              console.log("nytimesResult length:" + nytimesResult.length);
-              console.log("articleList" + articleList);
-              console.log("NYTIMES SUCCESS");
-              //SORT articleList
-              res.render("results", {articleList: articleList});
-            } else {
-              console.log("Hanging ...");
-              res.redirect("/");
-            }//inner if
-          });//second request (the new york times)
+          fetchFromNYT(searchTerm, articleList, function(articles){
+            res.render("results", { articleList: articles});
+          }, function(){
+            console.log("NYT Error");
+            res.redirect("/");
+          });
         }//outer if
       });//first request(the guardian)
   }//close else

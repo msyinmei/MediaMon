@@ -1,0 +1,9 @@
+<% if (user.Keywords && user.Keywords.length > 0) { %>
+<p>Keywords:
+  <% user.Keywords.forEach(function (tag) { %>
+  <div>
+  <a href="#"><%= keywords.name %></a>
+  </div>
+  <% }) %>
+<p>
+<% } %>

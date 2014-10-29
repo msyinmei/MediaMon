@@ -1,8 +1,10 @@
 <% include partials/header %>
 
+
 <br>
 <h1 class="masthead"> The Monitor </h1>
 <br>
+
 
 <p>
   <form action="/search" method="GET">
@@ -13,12 +15,27 @@
   </p>
 
 
+<% if (isAuthenticated) { %>
+
+<% if (user.Keywords && user.Keywords.length > 0) { %>
+<p>Keywords:
+  <% user.Keywords.forEach(function (tag) { %>
+  <div>
+  <a href="#"><%= keywords.name %></a>
+  </div>
+  <% }) %>
+<p>
+<% } %>
+
+<% } %>
+
+<hr>
+
+
+<div class="col-md-12" id="container">
+<% if (articleList !== []) { %>
       <!-- Loop over all the articles in articleList -->
       <% articleList.forEach(function (article) {%>
-
-      <!-- Only show the results that are movies -->
-      <!-- (i.e., do not show TV shows) -->
-      <!-- Show the title and the imdbID -->
       <div class="col-md-3 article">
 
       <p><!-- Twitter button  -->
@@ -32,24 +49,22 @@
       >Tweet</a>
       <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
       </script><br>
-      <!-- end twitter button-->
+
+
       <a href="<%= article.url %>"> <%=article.title%></a>
-
-
              <br> <%=article.date%> <br> <%= article.source %>
 
-              <% if (article.summary !== undefined) {%>
+      <% if (article.summary !== undefined) {%>
               <p>"<%= article.summary %>"</p>
             <% } %>
 
-<!--       <% if (article.imgurl !== undefined) {%>
-              <img src="<%= article.imgurl %>" alt="thumbnail">
-            <% } %> -->
 
 
       </p>
       </div>
-      <!-- Close the `forEach` -->
+
       <% }) %>
+<% } %>
+</div>
 
 <% include partials/footer %>

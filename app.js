@@ -9,13 +9,19 @@ var express = require("express"),
   cookieParser = require("cookie-parser"),
   session = require("cookie-session"),
   db = require("./models/index"),
-  flash = require("connect-flash");
+  flash = require("connect-flash"),
+  morgan = require('morgan'),
+  routeMiddleware = require('./config/routes');
 
 //MIDDLEWARE
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(methodOverride('_method'));
+
+//Middleware for ejs, grabbing HTML and including static files
+app.use(morgan('dev'));
+
 app.use(session({
   secret: 'supersecretkey',
   name:'chocolate',
@@ -28,6 +34,13 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
+
+//pushes isAuthenticated and user to every page
+app.use(function(req,res,next){
+  res.locals = {isAuthenticated: req.isAuthenticated(), user: req.user};
+  next();
+});
+
 //prepare our serialize functions
 passport.serializeUser(function(user, done){
   console.log("SERIALIZED JUST RAN!");
@@ -53,15 +66,48 @@ app.get('/', function(req, res){
   res.render('home');
 });
 
-//Public Search Page
+app.get('/home', function(req, res){
+
+  if(req.user){
+    db.User.find(req.user.id).done(function(err,user){
+    user.getKeywords().done(function(err,keywords){
+      res.render('home',{keywords:keywords});
+    });
+  });
+  }
+  else{
+    res.render('home');
+  }
+});
+
+
+//Public Search Page & APIs
 app.get('/search', function(req, res){
-  //grab the
-  var searchTerm = req.query.keyword;
-  var articleTemp = {};
-  var articleList = [];
+var keyword = req.query.keyword;
+
+  db.Keyword.findorCreate({
+    where: {
+      name: keyword
+    }
+  }).done(function(err, keyword, created){
+    db.KeywordsUser.create({
+      UserId: req.user.id,
+      KeywordId: keyword.id
+    }).done(function(err,result){
+      db.KeywordsUser.find({
+        where: {
+          UserId: req.user.id
+        }
+      }).done(function(err,user){
+        user.getKeywords().done(function(err,keywords){
+
+
+
+  var articleTemp = {};//temporary variable for constructor
+  var articleList = [];//list of all the articles called.
   //
   var guardianUrl = "http://content.guardianapis.com/search?api-key=fv7j8zaj9h52wmtkd6s77bxc&order-by=newest&q=" + searchTerm;
-  var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + searchTerm + "&api-key=1878509ebcc1080b029ef031ea085599%3A0%3A70065346";
+  var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + keyword + "&api-key=1878509ebcc1080b029ef031ea085599%3A0%3A70065346";
 
   //call THE GUARDIAN API searching for search query-related articles
   request(guardianUrl, function(error, response, body){
@@ -107,32 +153,71 @@ app.get('/search', function(req, res){
         console.log(guardianResult.length);
         console.log(articleList);
         console.log("NYTIMES SUCCESS");
-
-
-
-        // res.send(guardianResult)
        //SORT articleList
 
-      res.render("results", { articleList: articleList
+      res.render("results", { articleList: articleList, user: req.user, keywords: keywords
       });
     }//inner if
     });//second request (the new york times)
   }//outer if
   });//first request(the guardian)
 });
-
-//
-
-
-//
-
+});
+});
+});
+});
+//Signup
+app.get('/signup', routeMiddleware.preventLoginSignup, function(req,res){
+    res.render('signup', { username: ""});
+});
 
 //Login
+app.get('/login', routeMiddleware.preventLoginSignup, function(req,res){
+  res.render('login', {message: req.flash('loginMessage'), username:""});
+});
 
+// on submit, create a new users using form values
+app.post('/submit', function(req,res){
 
-//Signup
+  db.User.createNewUser(req.body.username, req.body.password,
+    req.body.email, req.body.twitter,
+  function(err){
+    res.render("home", {message: err.message, username: req.body.username});
+  },
+  function(success){
+    res.render("home", {message: success.message});
+  });
+});
 
+// authenticate users when logging in - no need for req,res passport does this for us
+app.post('/login', passport.authenticate('local', {
+  successRedirect: '/home',
+  failureRedirect: '/login',
+  failureFlash: true
+}));
 
+app.get('/logout', function(req,res){
+  //req.logout added by passport - delete the user id/session
+  req.logout();
+  res.redirect('/');
+});
+
+//////////////KEYWORD ROUTES/////////////
+app.get('/search', function(req,res){
+  var keyword = req.query.keyword;
+
+  db.Keyword.findorCreate({
+    where: {
+      name: keyword
+    }
+  }).done(function(err, keyword, created){
+    db.KeywordsUser.create({
+      UserId: req.user.id,
+      KeywordId: keyword.id
+    }).done(function(err,result){
+      res.render('')
+    })
+  });
 
 
 //404

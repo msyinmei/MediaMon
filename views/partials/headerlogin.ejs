@@ -1,1 +1,101 @@
-  <a href="/login">Log in</a>
+<% if (!isAuthenticated) { %>
+
+
+<!-- Register modal -->
+
+<li><a data-toggle="modal" data-target=".bs-example-modal-lg">Register</a>
+
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 class="modal-title" id="myModalLabel">Register </h3>
+    </div>
+
+    <div class="modal-body">
+      <form action="/submit" method = "post">
+        <p>
+          <label for="user">Username:</label> <input type="text" name="username" id="user" autofocus placeholder="Username">
+        </p>
+        <p>
+          <label for="pass">Password:</label> <input type="password" name="password" id="pass" placeholder="password">
+        </p>
+        <p>
+          <label for="email">Email:</label> <input type="email" name="email" id="email" placeholder = "email">
+        </p>
+        <p>
+          <label for="twitter">Twitter:</label> <input type="text" name="twitter" id="twitter" placeholder="@twitterid">
+        </p>
+        <p>
+          <input type="submit" value="Register" class ="btn">
+        </p>
+      </form>
+    </div>
+    <div class="modal-footer">
+        Already a user?
+        <a data-dismiss="modal" data-toggle="modal" data-target=".bs-example-modal-sm">Sign in here</a>
+    </div>
+
+    </div>
+  </div>
+</div>
+</li>
+
+
+<!-- Log in modal -->
+<li>
+<a  data-toggle="modal" data-target=".bs-example-modal-sm">Log in</a>
+
+<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 class="modal-title" id="myModalLabel">Log in</h3>
+      </div>
+
+      <div class="modal-body">
+        <form action="/login" method = "post">
+          <p>
+            <label for="user">Username:</label> <input type="text" name="username" id="user" autofocus>
+          </p>
+          <p>
+            <label for="pass">Password:</label> <input type="password" name="password" id="pass">
+          </p>
+          <p>
+            <input type="submit" value="Log In" class ="btn ">
+          </p>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        New user?
+        <a data-dismiss="modal" data-toggle="modal" data-target=".bs-example-modal-lg">Register here</a>
+      </div>
+    </div>
+  </div>
+</div>
+</li>
+
+<% } else { %>
+
+<li>
+<div class="dropdown">
+  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+    You are logged in as <%= user.username %><span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+<!--     <li><a href="/authors/<%= user.id %>/posts">Posts</a></li>
+    <li><a href="/posts/new">New</a></li>
+    <li><a href="/authors/<%= user.id %>/edit">Edit Profile</a></li>
+    <li class="divider"></li> -->
+    <li><a href="/logout">Log out</a></li>
+  </ul>
+</div>
+<li>
+
+
+
+<% } %>

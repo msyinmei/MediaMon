@@ -1,3 +1,6 @@
+
+
+
 .main {
 background-image: url('../images/paperbackground.jpg');
 background-position: top;
@@ -12,14 +15,33 @@ h1.masthead{
   margin: auto;
 }
 
-article{
-  color: #000000;
-  border: 2px solid;
+.article {
+  border: 2px dotted #000000;
 }
 
-/*a {
+input.searchbox, .form-control:focus, .form-control {
+background: 0;
+-webkit-box-shadow: none;
+box-shadow: none;
+border: 0;
+height: 60px;
+min-width: 100px;
+max-width: 500px;
+border-bottom: 3px solid #000000;
+outline: none;
+color: #000000;
+text-align:center;
+line-height: 1.2em;
+margin: auto;
+transition: none;
+font-size: 25px;
+}
+
+
+
+a {
   color: #000000;
-}*/
+}
 
 .navbar-custom {
     background:rgba(200,54,54,0.5);
@@ -28,13 +50,13 @@ article{
 }
 
 .navbar-custom .navbar-nav > li > a {
-    color:#fff;
+    color:#000000;
 }
 
 .navbar-custom .navbar-nav > .active > a, .navbar-nav > .active > a:hover, .navbar-nav > .active > a:focus {
-    color: #ffffff;
-    background-color:rgba(200,54,54,0.5);
+    color: #000000;
+    background-color:rgba(0,0,0,0.5);
 }
 .navbar-custom .navbar-brand {
-    color:#eeeeee;
+    color:#000000;
 }

@@ -1,0 +1,27 @@
+<% include partials/header %>
+
+<h1> Sign Up Form</h1>
+
+    <% if(typeof message !== 'undefined') {%>
+    <p class="error"> *<%= message %> </p>
+    <% }%>
+
+<br>
+<form action="/submit" method = "post">
+      <p>
+        <label for="user">Username:</label> <input type="text" name="username" id="user" autofocus placeholder="Username">
+      </p>
+      <p>
+        <label for="pass">Password:</label> <input type="password" name="password" id="pass" placeholder="password">
+      </p>
+      <p>
+        <label for="email">Email:</label> <input type="email" name="email" id="email" placeholder = "email">
+      </p>
+      <p>
+        <label for="twitter">Twitter:</label> <input type="text" name="twitter" id="twitter" placeholder="@twitterid">
+      </p>
+      <p>
+        <input type="submit" value="Log In" class ="btn btn-primary ">
+      </p>
+    </form>
+<% include partials/footer %>

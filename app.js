@@ -59,6 +59,9 @@ passport.deserializeUser(function(id, done){
 });
 
 
+//GLOBAL VARIABLES
+
+
 /////////ROUTES AND FUNCTIONS//////////
 
 //Home
@@ -81,91 +84,182 @@ app.get('/home', function(req, res){
 });
 
 
-//Public Search Page & APIs
+//CREATE KEYWORD on SEARCH
 app.get('/search', function(req, res){
-var keyword = req.query.keyword;
 
-  db.Keyword.findorCreate({
+if (req.user){
+  var keyword = req.query.keyword;
+  console.log("Keyword:" + keyword);
+  db.Keyword.findOrCreate({
     where: {
       name: keyword
     }
   }).done(function(err, keyword, created){
-    db.KeywordsUser.create({
-      UserId: req.user.id,
-      KeywordId: keyword.id
-    }).done(function(err,result){
-      db.KeywordsUser.find({
+    console.log("Created Keyword ERR:" + err);
+    console.log("Created Keyword:" + keyword);
+    db.KeywordsUser.findOrCreate({
+      where: {
+        UserId: req.user.id,
+        KeywordId: keyword.id
+      }
+    }).done(function(err, result){
+      db.User.find({
         where: {
-          UserId: req.user.id
+          id: req.user.id
         }
       }).done(function(err,user){
-        user.getKeywords().done(function(err,keywords){
+        user.getKeywords().done(function(err, keywords){
+          //Declare search term
+          var searchTerm = null;
+          //Declare variables for Search Results from APIs
+          var articleList = [];
+          var keywordList = keywords;
+
+          keywords.forEach(function(keyword){
+            //assign new keyword to searchTerm
+            searchTerm = keyword.name;
+            console.log(searchTerm);
+            var articleTemp = {};//temporary variable for constructor
+
+            //Declare URls for APIs
+            var guardianUrl = "http://content.guardianapis.com/search?api-key=fv7j8zaj9h52wmtkd6s77bxc&order-by=newest&q=" + searchTerm;
+            var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + searchTerm + "&api-key=1878509ebcc1080b029ef031ea085599%3A0%3A70065346";
+
+            //call THE GUARDIAN API searching for search query-related articles
+            request(guardianUrl, function(error, response, body){
+              console.log("GUARDIAN SEARCH");
+              articleList = [];
+              if (!error && response.statusCode == 200){
+                var guardianResult = (JSON.parse(body)).response.results;
+                // console.log(guardianResult);
+                guardianResult.forEach(function(article){
+                  articleTemp = {};
+                  articleTemp.title = article.webTitle;
+                  articleTemp.url = article.webUrl;
+                  articleTemp.date = article.webPublicationDate;
+                  articleTemp.source = "The Guardian";
+                  articleTemp.twitter = "@guardian";
+                  console.log("guardian article for" + searchTerm);
+                  articleList.push(articleTemp);
+                });
+                  console.log("articleList length:" + articleList.length);
+                  console.log("guardianResult length:" + guardianResult.length);
+                  console.log("articleList" + articleList);
+                console.log("GUARDIAN SUCCESS");
+
+                //call THe NY TIMES API searching for search query-related articles
+                request(nytimesUrl, function(error, response, body){
+                  console.log("NYTIMES SEARCH code:" + response.statusCode);
+
+                  if (!error && response.statusCode === 200){
+                    var nytimesResult = JSON.parse(body).response.docs;
+                    //console.log(nytimesResult);
+                    nytimesResult.forEach(function(article){
+                            articleTemp = {};
+                            articleTemp.title = article.headline.main;
+                            articleTemp.url = article.web_url;
+                            articleTemp.date = article.pub_date;
+                            articleTemp.summary = article.snippet;
+                            articleTemp.source = article.source;
+                            articleTemp.twitter = "@nytimes";
+                            // articleTemp.imgurl = "https://nytimes.com/" + (article.multimedia[0].url);
+                            console.log("nytimes article for" + searchTerm);
+                            articleList.push(articleTemp);
+                          });
+                    console.log("articleList length:" + articleList.length);
+                    console.log("guardianResult length:" + guardianResult.length);
+                    console.log("nytimesResult length:" + nytimesResult.length);
+                    console.log("articleList" + articleList);
+                    console.log("NYTIMES SUCCESS");
+                    //SORT articleList
+                    res.render("results", { articleList: articleList, user: req.user, keywordList: keywordList});
+                  } else {
+                    console.log("Hanging ...");
+                    res.redirect("/");
+                  }//inner if
+                });//second request (the new york times)
+              }//outer if
+            });//first request(the guardian)
+          });//Keywords forEach function
+        });// user.getKeywords find
+      });// keyworduser create
+    });//find user
+  });// create keyword
+
+
+} else {
+
+      //assign new keyword to searchTerm
+      var searchTerm = req.query.keyword;
+      //Declare variables for Search Results from APIs
+
+      var articleTemp = {};
+      var articleList = [];
+
+      //Declare URls for APIs
+      var guardianUrl = "http://content.guardianapis.com/search?api-key=fv7j8zaj9h52wmtkd6s77bxc&order-by=newest&q=" + searchTerm;
+      var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + searchTerm + "&api-key=1878509ebcc1080b029ef031ea085599%3A0%3A70065346";
+
+      //call THE GUARDIAN API searching for search query-related articles
+      request(guardianUrl, function(error, response, body){
+        console.log("GUARDIAN SEARCH");
+        articleList = [];
+        if (!error && response.statusCode == 200){
+          var guardianResult = (JSON.parse(body)).response.results;
+          // console.log(guardianResult);
+          guardianResult.forEach(function(article){
+            articleTemp = {};
+            articleTemp.title = article.webTitle;
+            articleTemp.url = article.webUrl;
+            articleTemp.date = article.webPublicationDate;
+            articleTemp.source = "The Guardian";
+            articleTemp.twitter = "@guardian";
+            console.log("guardian article for" + searchTerm);
+            articleList.push(articleTemp);
+          });
+            console.log("articleList length:" + articleList.length);
+            console.log("guardianResult length:" + guardianResult.length);
+            console.log("articleList" + articleList);
+          console.log("GUARDIAN SUCCESS");
+
+          //call THe NY TIMES API searching for search query-related articles
+          request(nytimesUrl, function(error, response, body){
+            console.log("NYTIMES SEARCH code:" + response.statusCode);
+
+            if (!error && response.statusCode === 200){
+              var nytimesResult = JSON.parse(body).response.docs;
+              //console.log(nytimesResult);
+              nytimesResult.forEach(function(article){
+                      articleTemp = {};
+                      articleTemp.title = article.headline.main;
+                      articleTemp.url = article.web_url;
+                      articleTemp.date = article.pub_date;
+                      articleTemp.summary = article.snippet;
+                      articleTemp.source = article.source;
+                      articleTemp.twitter = "@nytimes";
+                      // articleTemp.imgurl = "https://nytimes.com/" + (article.multimedia[0].url);
+                      console.log("nytimes article for" + searchTerm);
+                      articleList.push(articleTemp);
+                    });
+              console.log("articleList length:" + articleList.length);
+              console.log("guardianResult length:" + guardianResult.length);
+              console.log("nytimesResult length:" + nytimesResult.length);
+              console.log("articleList" + articleList);
+              console.log("NYTIMES SUCCESS");
+              //SORT articleList
+              res.render("results", {articleList: articleList});
+            } else {
+              console.log("Hanging ...");
+              res.redirect("/");
+            }//inner if
+          });//second request (the new york times)
+        }//outer if
+      });//first request(the guardian)
+  }//close else
+});//close App
 
 
 
-  var articleTemp = {};//temporary variable for constructor
-  var articleList = [];//list of all the articles called.
-  //
-  var guardianUrl = "http://content.guardianapis.com/search?api-key=fv7j8zaj9h52wmtkd6s77bxc&order-by=newest&q=" + searchTerm;
-  var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + keyword + "&api-key=1878509ebcc1080b029ef031ea085599%3A0%3A70065346";
-
-  //call THE GUARDIAN API searching for search query-related articles
-  request(guardianUrl, function(error, response, body){
-    console.log("GUARDIAN SEARCH");
-    articleList = [];
-    if (!error && response.statusCode == 200){
-      var guardianResult = (JSON.parse(body)).response.results;
-      console.log(guardianResult);
-      guardianResult.forEach(function(article){
-        articleTemp = {};
-        articleTemp.title = article.webTitle;
-        articleTemp.url = article.webUrl;
-        articleTemp.date = article.webPublicationDate;
-        articleTemp.source = "The Guardian";
-        articleTemp.twitter = "@guardian";
-        articleList.push(articleTemp);
-      });
-      console.log(articleList.length);
-      console.log(guardianResult.length);
-      console.log(articleList);
-      console.log("GUARDIAN SUCCESS");
-
-  //call THe NY TIMES API searching for search query-related articles
-  request(nytimesUrl, function(error, response, body){
-    console.log("NYTIMES SEARCH");
-
-      if (!error && response.statusCode === 200){
-        var nytimesResult = JSON.parse(body).response.docs;
-        console.log(nytimesResult);
-        nytimesResult.forEach(function(article){
-                articleTemp = {};
-                articleTemp.title = article.headline.main;
-                articleTemp.url = article.web_url;
-                articleTemp.date = article.pub_date;
-                articleTemp.summary = article.snippet;
-                articleTemp.source = article.source;
-                articleTemp.twitter = "@nytimes";
-                // articleTemp.imgurl = "https://nytimes.com/" + (article.multimedia[0].url);
-                console.log("MULTIMEDIA URL");
-                articleList.push(articleTemp);
-              });
-        console.log(articleList.length);
-        console.log(guardianResult.length);
-        console.log(articleList);
-        console.log("NYTIMES SUCCESS");
-       //SORT articleList
-
-      res.render("results", { articleList: articleList, user: req.user, keywords: keywords
-      });
-    }//inner if
-    });//second request (the new york times)
-  }//outer if
-  });//first request(the guardian)
-});
-});
-});
-});
-});
 //Signup
 app.get('/signup', routeMiddleware.preventLoginSignup, function(req,res){
     res.render('signup', { username: ""});
@@ -203,21 +297,21 @@ app.get('/logout', function(req,res){
 });
 
 //////////////KEYWORD ROUTES/////////////
-app.get('/search', function(req,res){
-  var keyword = req.query.keyword;
+// app.get('/search', function(req,res){
+//   var keyword = req.query.keyword;
 
-  db.Keyword.findorCreate({
-    where: {
-      name: keyword
-    }
-  }).done(function(err, keyword, created){
-    db.KeywordsUser.create({
-      UserId: req.user.id,
-      KeywordId: keyword.id
-    }).done(function(err,result){
-      res.render('')
-    })
-  });
+//   db.Keyword.findorCreate({
+//     where: {
+//       name: keyword
+//     }
+//   }).done(function(err, keyword, created){
+//     db.KeywordsUser.create({
+//       UserId: req.user.id,
+//       KeywordId: keyword.id
+//     }).done(function(err,result){
+//       res.render('')
+//     })
+//   });
 
 
 //404

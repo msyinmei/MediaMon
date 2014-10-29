@@ -23,7 +23,7 @@ module.exports = function(sequelize, DataTypes) {
   {
     classMethods: {
       associate: function(db) {
-      User.hasMany(db.KeywordsUser);
+      User.hasMany(db.Keyword);
       // User.hasMany(db.Article);
       },
       encryptPass: function(password){

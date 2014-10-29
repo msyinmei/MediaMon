@@ -5,7 +5,6 @@
 <h1 class="masthead"> The Monitor </h1>
 <br>
 
-
 <p>
   <form action="/search" method="GET">
     <div class="form-group" >
@@ -16,20 +15,18 @@
 
 
 <% if (isAuthenticated) { %>
-
-<% if (user.Keywords && user.Keywords.length > 0) { %>
-<p>Keywords:
-  <% user.Keywords.forEach(function (tag) { %>
+<% if (keywordList.length > 0) { %>
+<p><% keywordList.forEach(function (keyword) { %>
   <div>
-  <a href="#"><%= keywords.name %></a>
+    <a href="#"><%= keyword.name %></a>
   </div>
   <% }) %>
 <p>
 <% } %>
-
 <% } %>
 
-<hr>
+
+
 
 
 <div class="col-md-12" id="container">
@@ -38,7 +35,6 @@
       <% articleList.forEach(function (article) {%>
       <div class="col-md-3 article">
 
-      <p><!-- Twitter button  -->
       <a href="https://twitter.com/share"
       class="twitter-share-button"
       data-via="your_screen_name"
@@ -58,9 +54,6 @@
               <p>"<%= article.summary %>"</p>
             <% } %>
 
-
-
-      </p>
       </div>
 
       <% }) %>

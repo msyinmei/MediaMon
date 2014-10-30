@@ -10,4 +10,16 @@
   </form>
   </p>
 
+  <% if (isAuthenticated) { %>
+  <div>
+    <% if (keywordList.length > 0) { %>
+      <p>
+        <% keywordList.forEach(function (keyword) { %>
+          <a href="/search?keyword=<%= keyword.name %>" class="keywordbtn"><%= keyword.name %></a>
+        <% }) %>
+      <p>
+    <% } %>
+  </div>
+<% } %>
+
 <% include partials/footer %>

@@ -1,14 +1,14 @@
 <% include partials/header %>
 
 
-<br>
+<!-- <br>
 <h1 class="masthead"> The Monitor </h1>
-<br>
+<br> -->
 
 <p>
   <form action="/search" method="GET">
     <div class="form-group" >
-      <input type="text" name="keyword" id="keyword" size="30" class="form-control" placeholder="Search">
+      <input type="text" name="keyword" id="keyword" size="30" class="form-control" placeholder="SEARCH THE MONITOR">
     </div>
   </form>
   </p>
@@ -19,7 +19,7 @@
     <% if (keywordList.length > 0) { %>
       <p>
         <% keywordList.forEach(function (keyword) { %>
-        <div class="keyworddiv">
+        <div class="btn keywordbtn">
           <a href="/search?keyword=<%= keyword.name %>"><%= keyword.name %></a>
         </div>
         <% }) %>
@@ -31,12 +31,11 @@
   <div id="container">
     <% if (articleList !== []) { %>
       <% articleList.forEach(function (articleObj) {%>
-        <% if (articleObj.guardian) { %>
           <% articleObj.guardian.forEach(function (article) { %>
 
             <div class="articlediv">
 
-              <!-- <a href="https://twitter.com/share"
+<!--               <a href="https://twitter.com/share"
               class="twitter-share-button"
               data-counturl="<%= article.url %>"
               data-count="vertical"
@@ -51,16 +50,14 @@
               <a href="<%= article.url %>"> <%=article.title%></a>
                  <br> <%=article.date%> <br> <%= article.source %>
 
-
-
             </div>
           <% }) %>
-        <% } else if (articleObj.nyt) { %>
+
           <% articleObj.nyt.forEach(function (article){ %>
 
             <div class="articlediv">
 
-              <!-- <a href="https://twitter.com/share"
+<!--               <a href="https://twitter.com/share"
               class="twitter-share-button"
               data-counturl="<%= article.url %>"
               data-count="vertical"
@@ -72,7 +69,7 @@
               </script><br> -->
 
 
-              <a href="<%= article.url %>"> <%=article.title%></a>
+              <a href="<%= article.url %>"><%=article.title%></a>
               <br> <%=article.date%> <br> <%= article.source %>
 
               <% if (article.summary !== undefined) {%>
@@ -80,8 +77,8 @@
               <% } %>
 
             </div>
+
           <% })%>
-        <% } %>
       <% }) %>
     <% } %>
   </div>

@@ -76,7 +76,7 @@ var fetchFromGuardian = function(searchTerm, success, error){
                   articleTemp.date = article.webPublicationDate;
                   articleTemp.source = "The Guardian";
                   articleTemp.twitter = "@guardian";
-                  console.log("guardian article for " + searchTerm);
+                  console.log("make guardian article for " + searchTerm);
                   articleList.push(articleTemp);
                 });
       console.log("articleList length:" + articleList.length);
@@ -107,7 +107,7 @@ var fetchFromNYT = function(searchTerm, success, error) {
               articleTemp.summary = article.snippet;
               articleTemp.source = article.source;
               articleTemp.twitter = "@nytimes";
-              console.log("nytimes article for " + searchTerm);
+              console.log("make nytimes article for " + searchTerm);
               articleList.push(articleTemp);
             });
       console.log("articleList length:" + articleList.length);
@@ -153,7 +153,7 @@ app.get('/', function(req, res){
   if(req.user){
     db.User.find(req.user.id).done(function(err,user){
     user.getKeywords().done(function(err,keywords){
-      res.render('home',{keywords:keywords});
+      res.render('home',{keywordList:keywords});
     });
   });
   }
@@ -167,7 +167,7 @@ app.get('/home', function(req, res){
   if(req.user){
     db.User.find(req.user.id).done(function(err,user){
     user.getKeywords().done(function(err,keywords){
-      res.render('home',{keywords:keywords});
+      res.render('home',{keywordList:keywords});
     });
   });
   }
@@ -279,10 +279,10 @@ app.get('/logout', function(req,res){
 //   });
 
 
-//404
-// app.get('*', function(req, res){
-//   res.render('404');
-// });
+// 404
+app.get('*', function(req, res){
+  res.render('404');
+});
 
 
 //3000

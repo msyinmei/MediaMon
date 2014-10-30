@@ -65,7 +65,11 @@ a {
   margin: 5px;
 }
 
-.keyworddiv{
+.btn .keyworddiv{
   width: 80px;
+  height: 20px;
+  border: 1px #000000 solid;
+  border-radius: 10px 10px;
+  text-align: center;
 }
 

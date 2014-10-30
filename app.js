@@ -1,7 +1,7 @@
 //REQUIRES
 var express = require("express"),
   app = express(),
-  request = require('request');
+  request = require('request'),
   methodOverride = require('method-override'),
   bodyParser = require("body-parser"),
   passport = require("passport"),
@@ -11,6 +11,7 @@ var express = require("express"),
   db = require("./models/index"),
   flash = require("connect-flash"),
   morgan = require('morgan'),
+  async = require('async'),
   routeMiddleware = require('./config/routes');
 
 //MIDDLEWARE
@@ -61,16 +62,16 @@ passport.deserializeUser(function(id, done){
 
 //GLOBAL FUNCTIONS
 
-var fetchFromGuardian = function(searchTerm, articleList, success, error){
+var fetchFromGuardian = function(searchTerm, success, error){
   var guardianUrl = "http://content.guardianapis.com/search?api-key=fv7j8zaj9h52wmtkd6s77bxc&order-by=newest&q=" + searchTerm;
-
+  var articleList = [];
   request(guardianUrl, function(error, response, body){
     console.log("GUARDIAN SEARCH code:" + response.statusCode);
         if (!error && response.statusCode == 200){
                 var guardianResult = (JSON.parse(body)).response.results;
                 // console.log(guardianResult);
                 guardianResult.forEach(function(article){
-                  articleTemp = {};
+                  var articleTemp = {};
                   articleTemp.title = article.webTitle;
                   articleTemp.url = article.webUrl;
                   articleTemp.date = article.webPublicationDate;
@@ -83,16 +84,16 @@ var fetchFromGuardian = function(searchTerm, articleList, success, error){
       console.log("guardianResult length:" + guardianResult.length);
       console.log("articleList" + articleList);
       console.log("GUARDIAN SUCCESS");
-      success();
+      success(articleList);
     } else {
       error();
     }
   });//first request(the guardian)
 };
 
-var fetchFromNYT = function(searchTerm, articleList, success, error) {
+var fetchFromNYT = function(searchTerm, success, error) {
   var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + searchTerm + "&api-key=1878509ebcc1080b029ef031ea085599%3A0%3A70065346";
-
+  var articleList = [];
   request(nytimesUrl, function(error, response, body){
     console.log("NYTIMES SEARCH code:" + response.statusCode);
 
@@ -123,6 +124,29 @@ var fetchFromNYT = function(searchTerm, articleList, success, error) {
   });// request (the new york times)
 };
 
+var fetchKeyword = function (keyword, callback) {
+  var searchTerm = keyword.name;
+  var results = {keyword:searchTerm};
+  //call THE GUARDIAN API searching for search query-related articles
+  fetchFromGuardian(searchTerm, function(guardianArticles){
+    //if fetchFromGuardian successful
+    //call The NY TIMES API searching for search query-related articles
+    results.guardian = guardianArticles;
+    fetchFromNYT(searchTerm, function(nytArticles){
+      results.nyt = nytArticles;
+      callback(null, results);
+    }, function(){
+      console.log("NYT Error");
+      callback("NYT Error", []);
+      //res.redirect("/");
+    });//NYT
+  }, function(){
+    //if fetchFromGuardian error
+      console.log("Guardian Error");
+      callback("Guardian Error", []);
+      //res.redirect("/");
+  });//Guardian
+};
 /////////ROUTES AND FUNCTIONS//////////
 
 //Home
@@ -159,52 +183,16 @@ if (req.user){
         KeywordId: keyword.id
       }
     }).done(function(err, result){
-      db.User.find({
-        where: {
-          id: req.user.id
-        }
-      }).done(function(err,user){
-        user.getKeywords().done(function(err, keywords){
-          //Declare search term
-          var searchTerm = null;
-          //Declare keyword list
-          var keywordList = keywords;
-          //Declare variables for Search Results from APIs
-          var articleList = [];
-
-          keywords.forEach(function(keyword){
-            //assign new keyword to searchTerm
-            searchTerm = keyword.name;
-            console.log(searchTerm);
-            var articleTemp = {};//temporary variable for constructor
-
-            //Declare URls for APIs
-            var guardianUrl = "http://content.guardianapis.com/search?api-key=fv7j8zaj9h52wmtkd6s77bxc&order-by=newest&q=" + searchTerm;
-            var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + searchTerm + "&api-key=1878509ebcc1080b029ef031ea085599%3A0%3A70065346";
-
-            //call THE GUARDIAN API searching for search query-related articles
-              fetchFromGuardian(searchTerm, articleList, function(){
-                //if fetchFromGuardian successful
-                //call The NY TIMES API searching for search query-related articles
-                fetchFromNYT(searchTerm, articleList, function(articles){
-                  res.render("results", { articleList: articles, user: req.user, keywordList: keywordList});
-                }, function(){
-                  console.log("NYT Error");
-                  res.redirect("/");
-                });//NYT
-              }, function(){
-                //if fetchFromGuardian error
-                  console.log("Guardian Error");
-                  res.redirect("/");
-              });//Guardian
-
-          });//Keywords forEach function
-        });// user.getKeywords find
-      });// keyworduser create
-    });//find user
-  });// create keyword
-
-
+      req.user.getKeywords().done(function(err, keywords){
+        // keywords.forEach(function(keyword){
+        async.map(keywords, fetchKeyword, function(err, results){
+          res.render("results", { articleList: results, user: req.user, keywordList: keywords});
+        });
+          // fetchKeyword(keyword.name);
+        // });
+      });
+    });
+  });
 } else {
 
       //assign new keyword to searchTerm
@@ -212,10 +200,6 @@ if (req.user){
       //Declare variables for Search Results from APIs
       var articleTemp = {};
       var articleList = [];
-
-      //Declare URls for APIs
-      var guardianUrl = "http://content.guardianapis.com/search?api-key=fv7j8zaj9h52wmtkd6s77bxc&order-by=newest&q=" + searchTerm;
-      var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + searchTerm + "&api-key=1878509ebcc1080b029ef031ea085599%3A0%3A70065346";
 
           //call THE GUARDIAN API searching for search query-related articles
       fetchFromGuardian(searchTerm, articleList, function(){

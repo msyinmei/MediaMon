@@ -34,7 +34,10 @@ transition: none;
 font-size: 25px;
 }
 
-
+#container {
+  margin: 0 auto;
+  position: relative;
+}
 
 a {
   color: #000000;

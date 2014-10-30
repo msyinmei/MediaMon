@@ -59,29 +59,36 @@ passport.deserializeUser(function(id, done){
 });
 
 
-//GLOBAL VARIABLES
+//GLOBAL FUNCTIONS
 
+var fetchFromGuardian = function(searchTerm, articleList, success, error){
+  var guardianUrl = "http://content.guardianapis.com/search?api-key=fv7j8zaj9h52wmtkd6s77bxc&order-by=newest&q=" + searchTerm;
 
-/////////ROUTES AND FUNCTIONS//////////
-
-//Home
-app.get('/', function(req, res){
-  res.render('home');
-});
-
-app.get('/home', function(req, res){
-
-  if(req.user){
-    db.User.find(req.user.id).done(function(err,user){
-    user.getKeywords().done(function(err,keywords){
-      res.render('home',{keywords:keywords});
-    });
-  });
-  }
-  else{
-    res.render('home');
-  }
-});
+  request(guardianUrl, function(error, response, body){
+    console.log("GUARDIAN SEARCH code:" + response.statusCode);
+        if (!error && response.statusCode == 200){
+                var guardianResult = (JSON.parse(body)).response.results;
+                // console.log(guardianResult);
+                guardianResult.forEach(function(article){
+                  articleTemp = {};
+                  articleTemp.title = article.webTitle;
+                  articleTemp.url = article.webUrl;
+                  articleTemp.date = article.webPublicationDate;
+                  articleTemp.source = "The Guardian";
+                  articleTemp.twitter = "@guardian";
+                  console.log("guardian article for" + searchTerm);
+                  articleList.push(articleTemp);
+                });
+      console.log("articleList length:" + articleList.length);
+      console.log("guardianResult length:" + guardianResult.length);
+      console.log("articleList" + articleList);
+      console.log("GUARDIAN SUCCESS");
+      success();
+    } else {
+      error();
+    }
+  });//first request(the guardian)
+};
 
 var fetchFromNYT = function(searchTerm, articleList, success, error) {
   var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + searchTerm + "&api-key=1878509ebcc1080b029ef031ea085599%3A0%3A70065346";
@@ -115,6 +122,23 @@ var fetchFromNYT = function(searchTerm, articleList, success, error) {
     }
   });// request (the new york times)
 };
+
+/////////ROUTES AND FUNCTIONS//////////
+
+//Home
+app.get('/', function(req, res){
+
+  if(req.user){
+    db.User.find(req.user.id).done(function(err,user){
+    user.getKeywords().done(function(err,keywords){
+      res.render('home',{keywords:keywords});
+    });
+  });
+  }
+  else{
+    res.render('home');
+  }
+});
 
 //CREATE KEYWORD on SEARCH
 app.get('/search', function(req, res){
@@ -159,36 +183,21 @@ if (req.user){
             var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + searchTerm + "&api-key=1878509ebcc1080b029ef031ea085599%3A0%3A70065346";
 
             //call THE GUARDIAN API searching for search query-related articles
-            request(guardianUrl, function(error, response, body){
-              console.log("GUARDIAN SEARCH");
-              articleList = [];
-              if (!error && response.statusCode == 200){
-                var guardianResult = (JSON.parse(body)).response.results;
-                // console.log(guardianResult);
-                guardianResult.forEach(function(article){
-                  articleTemp = {};
-                  articleTemp.title = article.webTitle;
-                  articleTemp.url = article.webUrl;
-                  articleTemp.date = article.webPublicationDate;
-                  articleTemp.source = "The Guardian";
-                  articleTemp.twitter = "@guardian";
-                  console.log("guardian article for" + searchTerm);
-                  articleList.push(articleTemp);
-                });
-                  console.log("articleList length:" + articleList.length);
-                  console.log("guardianResult length:" + guardianResult.length);
-                  console.log("articleList" + articleList);
-                console.log("GUARDIAN SUCCESS");
-
-                //call THe NY TIMES API searching for search query-related articles
+              fetchFromGuardian(searchTerm, articleList, function(){
+                //if fetchFromGuardian successful
+                //call The NY TIMES API searching for search query-related articles
                 fetchFromNYT(searchTerm, articleList, function(articles){
                   res.render("results", { articleList: articles, user: req.user, keywordList: keywordList});
                 }, function(){
                   console.log("NYT Error");
                   res.redirect("/");
-                });
-              }//outer if
-            });//first request(the guardian)
+                });//NYT
+              }, function(){
+                //if fetchFromGuardian error
+                  console.log("Guardian Error");
+                  res.redirect("/");
+              });//Guardian
+
           });//Keywords forEach function
         });// user.getKeywords find
       });// keyworduser create
@@ -208,53 +217,33 @@ if (req.user){
       var guardianUrl = "http://content.guardianapis.com/search?api-key=fv7j8zaj9h52wmtkd6s77bxc&order-by=newest&q=" + searchTerm;
       var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + searchTerm + "&api-key=1878509ebcc1080b029ef031ea085599%3A0%3A70065346";
 
-      //call THE GUARDIAN API searching for search query-related articles
-      request(guardianUrl, function(error, response, body){
-        console.log("GUARDIAN SEARCH");
-        articleList = [];
-        if (!error && response.statusCode == 200){
-          var guardianResult = (JSON.parse(body)).response.results;
-          // console.log(guardianResult);
-          guardianResult.forEach(function(article){
-            articleTemp = {};
-            articleTemp.title = article.webTitle;
-            articleTemp.url = article.webUrl;
-            articleTemp.date = article.webPublicationDate;
-            articleTemp.source = "The Guardian";
-            articleTemp.twitter = "@guardian";
-            console.log("guardian article for" + searchTerm);
-            articleList.push(articleTemp);
-          });
-            console.log("articleList length:" + articleList.length);
-            console.log("guardianResult length:" + guardianResult.length);
-            console.log("articleList" + articleList);
-          console.log("GUARDIAN SUCCESS");
-
-          //call THe NY TIMES API searching for search query-related articles
-          fetchFromNYT(searchTerm, articleList, function(articles){
-            res.render("results", { articleList: articles});
-          }, function(){
-            console.log("NYT Error");
-            res.redirect("/");
-          });
-        }//outer if
-      });//first request(the guardian)
+          //call THE GUARDIAN API searching for search query-related articles
+      fetchFromGuardian(searchTerm, articleList, function(){
+        //if fetchFromGuardian successful
+        //call The NY TIMES API searching for search query-related articles
+        fetchFromNYT(searchTerm, articleList, function(articles){
+          res.render("results", { articleList: articles});
+        }, function(){
+          console.log("NYT Error");
+          res.redirect("/");
+        });//NYT
+      }, function(){
+        //if fetchFromGuardian error
+          console.log("Guardian Error");
+          res.redirect("/");
+      });//Guardian
   }//close else
 });//close App
 
 
 
+////////SIGN UP AND LOGIN////////
 //Signup
 app.get('/signup', routeMiddleware.preventLoginSignup, function(req,res){
     res.render('signup', { username: ""});
 });
 
-//Login
-app.get('/login', routeMiddleware.preventLoginSignup, function(req,res){
-  res.render('login', {message: req.flash('loginMessage'), username:""});
-});
-
-// on submit, create a new users using form values
+//on submit, create a new users using form values
 app.post('/submit', function(req,res){
 
   db.User.createNewUser(req.body.username, req.body.password,
@@ -265,6 +254,11 @@ app.post('/submit', function(req,res){
   function(success){
     res.render("home", {message: success.message});
   });
+});
+
+//Login
+app.get('/login', routeMiddleware.preventLoginSignup, function(req,res){
+  res.render('login', {message: req.flash('loginMessage'), username:""});
 });
 
 // authenticate users when logging in - no need for req,res passport does this for us
@@ -281,12 +275,16 @@ app.get('/logout', function(req,res){
 });
 
 //////////////KEYWORD ROUTES/////////////
-// app.get('/search', function(req,res){
-//   var keyword = req.query.keyword;
+//
 
-//   db.Keyword.findorCreate({
+
+//DELETE
+// app.get('/keyword/:id', function(req,res){
+//   var keywordId = req.params.id;
+
+//   db.Keyword.findAll({
 //     where: {
-//       name: keyword
+//       id: keywordId
 //     }
 //   }).done(function(err, keyword, created){
 //     db.KeywordsUser.create({

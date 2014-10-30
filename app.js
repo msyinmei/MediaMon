@@ -86,6 +86,7 @@ var fetchFromGuardian = function(searchTerm, success, error){
       success(articleList);
     } else {
       console.log("ERROR WITH GUARDIAN", error);
+      success([]);
     }
   });//first request(the guardian)
 };
@@ -118,6 +119,7 @@ var fetchFromNYT = function(searchTerm, success, error) {
       success(articleList);
     } else {
       console.log("ERROR WITH NYTIMES", error);
+      success([]);
     }
   });// request (the new york times)
 };
@@ -195,6 +197,7 @@ if (req.user){
     }).done(function(err, result){
       req.user.getKeywords().done(function(err, keywords){
         async.map(keywords, fetchKeyword, function(err, results){
+
           res.render("results", { articleList: results, user: req.user, keywordList: keywords});
         });
       });

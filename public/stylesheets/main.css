@@ -12,10 +12,6 @@ h1.masthead{
   margin: auto;
 }
 
-.article {
-  border: 2px dotted #000000;
-}
-
 input.searchbox, .form-control:focus, .form-control {
 background: 0;
 -webkit-box-shadow: none;
@@ -34,17 +30,12 @@ transition: none;
 font-size: 25px;
 }
 
-#container {
-  margin: 0 auto;
-  position: relative;
-}
-
 a {
   color: #000000;
 }
 
 .navbar-custom {
-    background:rgba(200,54,54,0.5);
+    background-color:rgba(0,0,0,0.8);
     color:#000000;
     border-radius:0;
 }
@@ -54,9 +45,27 @@ a {
 }
 
 .navbar-custom .navbar-nav > .active > a, .navbar-nav > .active > a:hover, .navbar-nav > .active > a:focus {
+    background-color:rgba(0,0,0,0.8);
     color: #000000;
-    background-color:rgba(0,0,0,0.5);
 }
 .navbar-custom .navbar-brand {
     color:#000000;
 }
+
+#container{
+  margin: 0 auto;
+  width: 1200px;
+  position: relative;
+}
+
+.articlediv{
+  padding: 8px 8px;
+  width: 265px;
+  border: 1px #000000 solid;
+  margin: 5px;
+}
+
+.keyworddiv{
+  width: 80px;
+}
+

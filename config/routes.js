@@ -1,7 +1,7 @@
 var routeMiddleware = {
   checkAuthentication: function(req, res, next) {
     if (!req.user) {
-      res.render('result');
+      res.render('login', {message: "Please log in first"});
     }
     else {
      return next();
@@ -15,6 +15,8 @@ var routeMiddleware = {
     return next();
   }
 },
+
+
 
   preventLoginSignup: function(req, res, next) {
     if (req.user) {

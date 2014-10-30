@@ -15,12 +15,12 @@
 
 
 <% if (isAuthenticated) { %>
-  <div class="keyworddiv" id="container">
+  <div>
     <% if (keywordList.length > 0) { %>
       <p>
         <% keywordList.forEach(function (keyword) { %>
-        <div class ="btn">
-          <a href="#"><%= keyword.name %></a>
+        <div class="keyworddiv">
+          <a href="/search?keyword=<%= keyword.name %>"><%= keyword.name %></a>
         </div>
         <% }) %>
       <p>
@@ -28,62 +28,66 @@
   </div>
 <% } %>
 
+  <div id="container">
+    <% if (articleList !== []) { %>
+      <% articleList.forEach(function (articleObj) {%>
+        <% if (articleObj.guardian) { %>
+          <% articleObj.guardian.forEach(function (article) { %>
 
-<div class="col-md-12" id="container">
-  <% if (articleList !== []) { %>
-    <% articleList.forEach(function (articleObj) {%>
-      <% if (articleObj.guardian) { %>
-        <% articleObj.guardian.forEach(function (article) { %>
+            <div class="articlediv">
 
-          <div class="col-md-3 article">
-            <a href="https://twitter.com/share"
-            class="twitter-share-button"
-            data-counturl="<%= article.url %>"
-            data-count="vertical"
-            data-text="<%= article.title %> by <%= article.twitter %>: <%= article.url %>"
-            data-related="twitterdev:Twitter Developer Relations">
-            Tweet
-            </a>
-            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
-            </script><br>
-
-
-            <a href="<%= article.url %>"> <%=article.title%></a>
-               <br> <%=article.date%> <br> <%= article.source %>
+              <!-- <a href="https://twitter.com/share"
+              class="twitter-share-button"
+              data-counturl="<%= article.url %>"
+              data-count="vertical"
+              data-text="<%= article.title %> by <%= article.twitter %>: <%= article.url %>"
+              data-related="twitterdev:Twitter Developer Relations">
+              Tweet
+              </a>
+              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+              </script><br> -->
 
 
-
-          </div>
-        <% }) %>
-      <% } else if (articleObj.nyt) { %>
-        <% articleObj.nyt.forEach(function (article){ %>
-
-          <div class="col-md-3 article">
-
-            <a href="https://twitter.com/share"
-            class="twitter-share-button"
-            data-counturl="<%= article.url %>"
-            data-count="vertical"
-            data-text="<%= article.title %> by <%= article.twitter %>: <%= article.url %>"
-            data-related="twitterdev:Twitter Developer Relations">
-            Tweet
-            </a>
-            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
-            </script><br>
+              <a href="<%= article.url %>"> <%=article.title%></a>
+                 <br> <%=article.date%> <br> <%= article.source %>
 
 
-            <a href="<%= article.url %>"> <%=article.title%></a>
-            <br> <%=article.date%> <br> <%= article.source %>
 
-            <% if (article.summary !== undefined) {%>
-              <p>"<%= article.summary %>"</p>
-            <% } %>
+            </div>
+          <% }) %>
+        <% } else if (articleObj.nyt) { %>
+          <% articleObj.nyt.forEach(function (article){ %>
 
-          </div>
-        <% })%>
-      <% } %>
-    <% }) %>
-  <% } %>
-</div>
+            <div class="articlediv">
+
+              <!-- <a href="https://twitter.com/share"
+              class="twitter-share-button"
+              data-counturl="<%= article.url %>"
+              data-count="vertical"
+              data-text="<%= article.title %> by <%= article.twitter %>: <%= article.url %>"
+              data-related="twitterdev:Twitter Developer Relations">
+              Tweet
+              </a>
+              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+              </script><br> -->
+
+
+              <a href="<%= article.url %>"> <%=article.title%></a>
+              <br> <%=article.date%> <br> <%= article.source %>
+
+              <% if (article.summary !== undefined) {%>
+                <p>"<%= article.summary %>"</p>
+              <% } %>
+
+            </div>
+          <% })%>
+        <% } %>
+      <% }) %>
+    <% } %>
+  </div>
+
+
+
+
 
 <% include partials/footer %>

@@ -63,13 +63,12 @@ passport.deserializeUser(function(id, done){
 //GLOBAL FUNCTIONS
 
 var fetchFromGuardian = function(searchTerm, success, error){
-  var guardianUrl = "http://content.guardianapis.com/search?api-key=fv7j8zaj9h52wmtkd6s77bxc&order-by=newest&q=" + searchTerm;
+  var guardianUrl = "http://content.guardianapis.com/search?api-key=" + process.env.GUARDIAN_API + "&order-by=newest&q=" + searchTerm;
   var articleList = [];
   request(guardianUrl, function(error, response, body){
     console.log("GUARDIAN SEARCH code:" + response.statusCode);
         if (!error && response.statusCode == 200){
                 var guardianResult = (JSON.parse(body)).response.results;
-                // console.log(guardianResult);
                 guardianResult.forEach(function(article){
                   var articleTemp = {};
                   articleTemp.title = article.webTitle;
@@ -77,7 +76,7 @@ var fetchFromGuardian = function(searchTerm, success, error){
                   articleTemp.date = article.webPublicationDate;
                   articleTemp.source = "The Guardian";
                   articleTemp.twitter = "@guardian";
-                  console.log("guardian article for" + searchTerm);
+                  console.log("guardian article for " + searchTerm);
                   articleList.push(articleTemp);
                 });
       console.log("articleList length:" + articleList.length);
@@ -86,20 +85,19 @@ var fetchFromGuardian = function(searchTerm, success, error){
       console.log("GUARDIAN SUCCESS");
       success(articleList);
     } else {
-      error();
+      console.log("ERROR WITH GUARDIAN", error);
     }
   });//first request(the guardian)
 };
 
 var fetchFromNYT = function(searchTerm, success, error) {
-  var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + searchTerm + "&api-key=1878509ebcc1080b029ef031ea085599%3A0%3A70065346";
+  var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + searchTerm + "&api-key=" + process.env.NYT_API;
   var articleList = [];
   request(nytimesUrl, function(error, response, body){
     console.log("NYTIMES SEARCH code:" + response.statusCode);
 
     if (!error && response.statusCode === 200){
       var nytimesResult = JSON.parse(body).response.docs;
-      //console.log(nytimesResult);
       nytimesResult.forEach(function(article){
               var articleTemp = {};
               articleTemp.title = article.headline.main;
@@ -108,18 +106,18 @@ var fetchFromNYT = function(searchTerm, success, error) {
               articleTemp.summary = article.snippet;
               articleTemp.source = article.source;
               articleTemp.twitter = "@nytimes";
-              // articleTemp.imgurl = "https://nytimes.com/" + (article.multimedia[0].url);
-              console.log("nytimes article for" + searchTerm);
+              console.log("nytimes article for " + searchTerm);
               articleList.push(articleTemp);
             });
       console.log("articleList length:" + articleList.length);
       console.log("nytimesResult length:" + nytimesResult.length);
       console.log("articleList" + articleList);
       console.log("NYTIMES SUCCESS");
+
       //SORT articleList
       success(articleList);
     } else {
-      error();
+      console.log("ERROR WITH NYTIMES", error);
     }
   });// request (the new york times)
 };
@@ -129,7 +127,6 @@ var fetchKeyword = function (keyword, callback) {
   var results = {keyword:searchTerm};
   //call THE GUARDIAN API searching for search query-related articles
   fetchFromGuardian(searchTerm, function(guardianArticles){
-    //if fetchFromGuardian successful
     //call The NY TIMES API searching for search query-related articles
     results.guardian = guardianArticles;
     fetchFromNYT(searchTerm, function(nytArticles){
@@ -138,19 +135,32 @@ var fetchKeyword = function (keyword, callback) {
     }, function(){
       console.log("NYT Error");
       callback("NYT Error", []);
-      //res.redirect("/");
     });//NYT
   }, function(){
     //if fetchFromGuardian error
       console.log("Guardian Error");
       callback("Guardian Error", []);
-      //res.redirect("/");
   });//Guardian
 };
+
 /////////ROUTES AND FUNCTIONS//////////
 
 //Home
 app.get('/', function(req, res){
+
+  if(req.user){
+    db.User.find(req.user.id).done(function(err,user){
+    user.getKeywords().done(function(err,keywords){
+      res.render('home',{keywords:keywords});
+    });
+  });
+  }
+  else{
+    res.render('home');
+  }
+});
+
+app.get('/home', function(req, res){
 
   if(req.user){
     db.User.find(req.user.id).done(function(err,user){
@@ -184,38 +194,24 @@ if (req.user){
       }
     }).done(function(err, result){
       req.user.getKeywords().done(function(err, keywords){
-        // keywords.forEach(function(keyword){
         async.map(keywords, fetchKeyword, function(err, results){
           res.render("results", { articleList: results, user: req.user, keywordList: keywords});
         });
-          // fetchKeyword(keyword.name);
-        // });
       });
     });
   });
 } else {
 
       //assign new keyword to searchTerm
-      var searchTerm = req.query.keyword;
+      var searchTerm = {name:req.query.keyword};
       //Declare variables for Search Results from APIs
-      var articleTemp = {};
       var articleList = [];
 
-          //call THE GUARDIAN API searching for search query-related articles
-      fetchFromGuardian(searchTerm, articleList, function(){
-        //if fetchFromGuardian successful
-        //call The NY TIMES API searching for search query-related articles
-        fetchFromNYT(searchTerm, articleList, function(articles){
-          res.render("results", { articleList: articles});
-        }, function(){
-          console.log("NYT Error");
-          res.redirect("/");
-        });//NYT
-      }, function(){
-        //if fetchFromGuardian error
-          console.log("Guardian Error");
-          res.redirect("/");
-      });//Guardian
+
+      fetchKeyword(searchTerm, function(err, results){
+        res.render("results", { articleList: [results]});
+      });
+
   }//close else
 });//close App
 
@@ -281,9 +277,9 @@ app.get('/logout', function(req,res){
 
 
 //404
-app.get('*', function(req, res){
-  res.render('404');
-});
+// app.get('*', function(req, res){
+//   res.render('404');
+// });
 
 
 //3000

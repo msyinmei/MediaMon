@@ -1,5 +1,6 @@
 .main {
-background-image: url('../images/paperbackground.jpg');
+background-image: url('../images/paperbackground2.jpg');
+background-repeat: repeat-y;
 background-position: top;
 max-width: 1400px;
 min-height: 100vh;

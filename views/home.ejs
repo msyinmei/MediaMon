@@ -1,35 +1,23 @@
 <% include partials/header %>
 
 
-<% if (isAuthenticated) { %>
-<br>
-<br>
-<div>
-  ***CAVEAT*** <br> App not complete, new keywords are generated per search and currently cannot be deleted. Log out to search trial keywords. Please note that API has limited capacity.
-</div>
-<% } %>
+
 
 <br>
 <br>
   <p>
   <form action="/search" method="GET">
     <div class="form-group" >
-      <input type="text" name="keyword" id="keyword" size="30" class="form-control searchbox" placeholder="SEARCH THE MONITOR" autofocus>
+      <input type="text" name="keyword" id="keyword" size="30" class="form-control searchbox" placeholder="ENTER KEYWORD & SEARCH" autofocus>
     </div>
   </form>
   </p>
 
-<% if (isAuthenticated) { %>
-  <div class="keyworddiv">
-    <% if (keywordList.length > 0) { %>
-        <% keywordList.forEach(function (keyword) { %>
-        <button type="button" class="btn btn-md">
-          <span class="glyphicon glyphicon-remove removebtn"></span>
-          <span><a href="/search?keyword=<%= keyword.name %>"><%= keyword.name%></a></span>
-        </button>
-      <% }) %>
-    <% } %>
-  </div>
+  <% if (isAuthenticated) { %>
+  <div class="instructions">
+  (Function in progress: Search a term. Then press the "+" to add keyword to
+    <button><a href="/my/keywords">MY KEYWORDS PAGE</a></button>.)
+  <div>
 <% } %>
 
 

@@ -30,6 +30,10 @@ transition: none;
 font-size: 25px;
 }
 
+.instructions{
+  text-align: center;
+}
+
 a {
   color: #000000;
 }

@@ -192,43 +192,38 @@ app.get('/home', function(req, res){
 //CREATE KEYWORD on SEARCH
 app.get('/search', function(req, res){
 
-if (req.user){
-  var keyword = req.query.keyword;
-  console.log("Keyword:" + keyword);
-  db.Keyword.findOrCreate({
-    where: {
-      name: keyword
-    }
-  }).done(function(err, keyword, created){
-    console.log("Created Keyword ERR:" + err);
-    console.log("Created Keyword:" + keyword);
-    db.KeywordsUser.findOrCreate({
-      where: {
-        UserId: req.user.id,
-        KeywordId: keyword.id
-      }
-    }).done(function(err, result){
-      req.user.getKeywords().done(function(err, keywords){
-        async.map(keywords, fetchKeyword, function(err, results){
-
-          res.render("results", { articleList: results, user: req.user, keywordList: keywords});
-        });
-      });
-    });
-  });
-} else {
+// if (req.user){
+//   var keyword = req.query.keyword;
+//   db.Keyword.findOrCreate({
+//     where: {
+//       name: keyword
+//     }
+//   }).done(function(err, keyword, created){
+//     db.KeywordsUser.findOrCreate({
+//       where: {
+//         UserId: req.user.id,
+//         KeywordId: keyword.id
+//       }
+//     }).done(function(err, result){
+//       req.user.getKeywords().done(function(err, keywords){
+//         async.map(keywords, fetchKeyword, function(err, results){
+//           res.render("results", { articleList: results, user: req.user, keywordList: keywords});
+//         });
+//       });
+//     });
+//   });
+// } else {
 
       //assign new keyword to searchTerm
       var searchTerm = {name:req.query.keyword};
       //Declare variables for Search Results from APIs
       var articleList = [];
 
-
       fetchKeyword(searchTerm, function(err, results){
         res.render("results", { articleList: [results], keyword: results.keyword});
       });
 
-  }//close else
+  // }//close else
 });//close App
 
 
@@ -285,6 +280,7 @@ app.get('/my/report', routeMiddleware.checkAuthentication, function(req,res){
   });
 });
 
+
 //My Keywords
 app.get('/my/keywords', routeMiddleware.checkAuthentication, function(req,res){
   req.user.getKeywords().done(function(err, keywords){
@@ -294,12 +290,68 @@ app.get('/my/keywords', routeMiddleware.checkAuthentication, function(req,res){
   });
 });
 
+//Add Keyword
+app.get('/:keyword', function(req, res){
+
+  if (req.user){
+    var keyword = req.params.keyword;
+    console.log("Keyword:" + keyword);
+    db.Keyword.findOrCreate({
+      where: {
+        name: keyword
+      }
+    }).done(function(err, keyword, created){
+      console.log("Created Keyword ERR:" + err);
+      console.log("Created Keyword:" + keyword);
+      db.KeywordsUser.findOrCreate({
+        where: {
+          UserId: req.user.id,
+          KeywordId: keyword.id
+        }
+      }).done(function(err, result){
+        req.user.getKeywords().done(function(err, keywords){
+          async.map(keywords, fetchKeyword, function(err, results){
+
+            res.render("my/keywords", { articleList: results, user: req.user, keywordList: keywords});
+          });
+        });
+      });
+    });
+  }
+});
+
+//Create Keyword
+app.get('/create/keyword', function(req, res){
+
+  if (req.user){
+    var keyword = req.query.keyword;
+    console.log("Keyword:" + keyword);
+    db.Keyword.findOrCreate({
+      where: {
+        name: keyword
+      }
+    }).done(function(err, keyword, created){
+      console.log("Created Keyword ERR:" + err);
+      console.log("Created Keyword:" + keyword);
+      db.KeywordsUser.findOrCreate({
+        where: {
+          UserId: req.user.id,
+          KeywordId: keyword.id
+        }
+      }).done(function(err, result){
+        req.user.getKeywords().done(function(err, keywords){
+          async.map(keywords, fetchKeyword, function(err, results){
+
+            res.render("my/keywords", { articleList: results, user: req.user, keywordList: keywords});
+          });
+        });
+      });
+    });
+  }
+});
 
 
-
-
-
-// //DELETE
+//DELETE
 // app.delete('/delete/keyword/:id', function(req,res){
 //   var keywordId = req.params.id;
 //   console.log(keywordId);

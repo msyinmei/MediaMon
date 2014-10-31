@@ -5,10 +5,11 @@
 <br>
 
 <br>
-<div>
-  This report contains all search results from your list of saved keywords. You may edit your keywords list on your keywords page. Each keyword below is a link to a page of only results from that keyword.
+<div class="instructions">
+  This report contains all search results from your list of saved keywords. Each keyword below is a link to a page of only results from that keyword.
 </div>
 <br>
+
 <hr>
   <div class="keyworddiv">
     <% if (keywordList.length > 0) { %>
@@ -16,10 +17,13 @@
           <span><a href="/show/?<%= keyword.name %>">|   <%= keyword.name%>   |</a></span>
       <% }) %>
       <% } %>
+      <button><a href="/my/keywords">EDIT MY KEYWORDS</a></button>
   </div>
 
 <hr>
-<p>*Search results are generated from The Guardian and The New York Times Open APIs.</p>
+<div class="instructions">
+*Search results are generated from The Guardian and The New York Times Open APIs.
+</div>
 <br>
 
   <div id="container">

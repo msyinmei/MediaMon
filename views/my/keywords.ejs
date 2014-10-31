@@ -1,11 +1,21 @@
 <% include ../partials/header %>
 
+<h1 class="masthead">My Keywords</h1>
+
+  <p>
+  <form action="/create/keyword" method="GET">
+    <div class="form-group" >
+      <input type="text" name="keyword" id="keyword" size="30" class="form-control" placeholder="ADD NEW KEYWORD" autofocus>
+    </div>
+  </form>
+</p>
+
   <div class="keyworddiv">
     <% if (keywordList.length > 0) { %>
         <% keywordList.forEach(function (keyword) { %>
         <button type="button" class="btn btn-md">
-          <a href="/delete"><span class="glyphicon glyphicon-remove removebtn"></span></a>
-          <span><a href="/search?keyword=<%= keyword.name %>"><%= keyword.name%></a></span>
+          <a href="/delete/keyword/<%= keyword.id %>"><span class="glyphicon glyphicon-remove removebtn"></span></a>
+          <span><a href="/search?keyword=<%= keyword.name %>"><%= keyword.name %></a></span>
         </button>
       <% }) %>
     <% } %>

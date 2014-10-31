@@ -290,6 +290,6 @@ app.get('*', function(req, res){
 
 
 //3000
-app.listen(3000, function(){
+app.listen(process.env.PORT || 3000, function(){
   "Server is listening on port 3000";
 });

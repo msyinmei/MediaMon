@@ -5,7 +5,7 @@
 <p>
   <form action="/search" method="GET">
     <div class="form-group" >
-      <input type="text" name="keyword" id="keyword" size="30" class="form-control" placeholder="ENTER KEYWORD & SEARCH" autofocus>
+      <input type="text" name="keyword" id="keyword" size="30" class="form-control" placeholder="SEARCH KEYWORD" autofocus>
     </div>
   </form>
 </p>
@@ -35,7 +35,7 @@ Search a term. Then press the "+" to add keyword to
 
 
 
-              <a href="<%= article.url %>"> <%=article.title%></a>
+              <h4><a href="<%= article.url %>"> <%=article.title%></a></h4>
                  <br> <%=article.date%> <br> <%= article.source %>
 
                  <br><br>Keyword: <%= article.keyword %><br>
@@ -60,7 +60,7 @@ Search a term. Then press the "+" to add keyword to
 
             <div class="articlediv">
 
-              <a href="<%= article.url %>"><%=article.title%></a>
+              <h4><a href="<%= article.url %>"><%=article.title%></a></h4>
               <br> <%=article.date%> <br> <%= article.source %>
 
               <% if (article.summary !== undefined) {%>

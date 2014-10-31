@@ -1,32 +1,26 @@
 <% include ../partials/header %>
 
-
-
-<% if (isAuthenticated) { %>
 <br>
+<h1 class="masthead"> MY REPORT </h1>
+<br>
+
 <br>
 <div>
-  ***CAVEAT*** <br> App not complete, new keywords are generated per search and currently cannot be deleted. Log out to search trial keywords. Please note that API has limited capacity.
+  This report contains all search results from your list of saved keywords. You may edit your keywords list on your keywords page. Each keyword below is a link to a page of only results from that keyword.
 </div>
-<% } %>
-
-
-
-<h1> MY REPORT</h1>
-
+<br>
 <hr>
-
-<% if (isAuthenticated) { %>
   <div class="keyworddiv">
     <% if (keywordList.length > 0) { %>
         <% keywordList.forEach(function (keyword) { %>
-          <span><a href="/show/<%= keyword.name %>"><%= keyword.name%></a></span>
+          <span><a href="/show/?<%= keyword.name %>">|   <%= keyword.name%>   |</a></span>
       <% }) %>
       <% } %>
   </div>
-<% } %>
 
 <hr>
+<p>*Search results are generated from The Guardian and The New York Times Open APIs.</p>
+<br>
 
   <div id="container">
     <% if (articleList !== []) { %>
@@ -34,8 +28,6 @@
           <% articleObj.guardian.forEach(function (article) { %>
 
             <div class="articlediv">
-
-
 
               <a href="<%= article.url %>"> <%=article.title%></a>
                  <br> <%=article.date%> <br> <%= article.source %>

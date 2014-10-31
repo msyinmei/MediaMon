@@ -322,6 +322,8 @@ app.get('/:keyword', function(req, res){
         });
       });
     });
+  } else {
+    res.render('login', {message: 'please log in to add keywords', username:""});
   }
 });
 

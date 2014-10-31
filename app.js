@@ -286,7 +286,7 @@ app.get('/my/keywords', routeMiddleware.checkAuthentication, function(req,res){
 });
 
 //Add Keyword
-app.get('/:keyword', function(req, res){
+app.get('/addkeyword/:keyword', function(req, res){
 
   if (req.user){
     var keyword = req.params.keyword;

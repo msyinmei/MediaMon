@@ -161,17 +161,7 @@ var fetchKeyword = function (keyword, callback) {
 
 //INDEX
 app.get('/', function(req, res){
-
-  if(req.user){
-    db.User.find(req.user.id).done(function(err,user){
-    user.getKeywords().done(function(err,keywords){
-      res.render('home',{keywordList:keywords});
-    });
-  });
-  }
-  else{
-    res.render('home');
-  }
+    res.render('index');
 });
 
 //HOME
@@ -266,7 +256,7 @@ app.post('/login', passport.authenticate('local', {
 app.get('/logout', function(req,res){
   //req.logout added by passport - delete the user id/session
   req.logout();
-  res.redirect('/');
+  res.redirect('/home');
 });
 
 //////////////USER ROUTES/////////////

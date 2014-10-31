@@ -214,12 +214,11 @@ if (req.user){
 
 
       fetchKeyword(searchTerm, function(err, results){
-        res.render("results", { articleList: [results]});
+        res.render("results", { articleList: [results], keyword: results.keyword});
       });
 
   }//close else
 });//close App
-
 
 
 ////////SIGN UP AND LOGIN////////
@@ -259,29 +258,45 @@ app.get('/logout', function(req,res){
   res.redirect('/');
 });
 
-//////////////KEYWORD ROUTES/////////////
-//
+//////////////USER ROUTES/////////////
+//My Profile
 
+//My Report
+app.get('/my/report', routeMiddleware.checkAuthentication, function(req, res){
 
-//DELETE
-app.delete('/delete/keyword/:id', function(req,res){
-  var keywordId = req.params.id;
-  console.log(keywordId);
-  res.redirect('/search');
+  req.user.getKeywords().done(function(err, keywords){
+    async.map(keywords, fetchKeyword, function(err, results){
 
-  // db.Keyword.findAll({
-  //   where: {
-  //     id: keywordId
-  //   }
-  // }).done(function(err, keyword, created){
-  //   db.KeywordsUser.create({
-  //     UserId: req.user.id,
-  //     KeywordId: keyword.id
-  //   }).done(function(err,result){
-  //     res.render('')
-  //   })
+      res.render('my/report', { articleList: results, user: req.user, keywordList: keywords});
+    });
   });
+});
 
+//My Keywords
+
+
+
+
+
+
+// //DELETE
+// app.delete('/delete/keyword/:id', function(req,res){
+//   var keywordId = req.params.id;
+//   console.log(keywordId);
+//   res.redirect('/search');
+
+//   // db.Keyword.findAll({
+//   //   where: {
+//   //     id: keywordId
+//   //   }
+//   // }).done(function(err, keyword, created){
+//   //   db.KeywordsUser.create({
+//   //     UserId: req.user.id,
+//   //     KeywordId: keyword.id
+//   //   }).done(function(err,result){
+//   //     res.render('')
+//   //   })
+//   });
 
 // 404
 app.get('*', function(req, res){

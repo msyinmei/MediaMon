@@ -1,9 +1,6 @@
-<% include partials/header %>
+<% include ../partials/header %>
 
 
-<!-- <br>
-<h1 class="masthead"> The Monitor </h1>
-<br> -->
 
 <% if (isAuthenticated) { %>
 <br>
@@ -13,40 +10,23 @@
 </div>
 <% } %>
 
-<p>
-  <form action="/search" method="GET">
-    <div class="form-group" >
-      <input type="text" name="keyword" id="keyword" size="30" class="form-control" placeholder="SEARCH THE MONITOR">
-    </div>
-  </form>
-  </p>
 
+
+<h1> MY REPORT</h1>
+
+<hr>
 
 <% if (isAuthenticated) { %>
   <div class="keyworddiv">
     <% if (keywordList.length > 0) { %>
         <% keywordList.forEach(function (keyword) { %>
-        <button type="button" class="btn btn-md">
-          <a href="/delete"><span class="glyphicon glyphicon-remove removebtn"></span></a>
-          <span><a href="/search?keyword=<%= keyword.name %>"><%= keyword.name%></a></span>
-        </button>
+          <span><a href="/show/<%= keyword.name %>"><%= keyword.name%></a></span>
       <% }) %>
-    <% } %>
+      <% } %>
   </div>
-<% } else { %>
-
-  <div class="keyworddiv">
-
-        <button type="button" class="btn btn-md">
-          <a href="/add/<% keyword %>"><span class="glyphicon glyphicon-plus"></span></a>
-          <span><a href="/search?keyword=<%= keyword %>">  <%=  keyword %></a></span>
-        </button>
-
-  </div>
-
 <% } %>
 
-
+<hr>
 
   <div id="container">
     <% if (articleList !== []) { %>
@@ -111,7 +91,5 @@
 
 
 
-<% include partials/footer %>
 
-
-
+<% include ../partials/footer %>

@@ -70,6 +70,10 @@ a {
   background-color: none;
 }
 
+.glyphicon {
+  line-height: none;
+}
+
 .removebtn{
   float: left;
 }

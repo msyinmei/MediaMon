@@ -76,6 +76,7 @@ var fetchFromGuardian = function(searchTerm, success, error){
                   articleTemp.date = article.webPublicationDate;
                   articleTemp.source = "The Guardian";
                   articleTemp.twitter = "@guardian";
+                  articleTemp.keyword = searchTerm;
                   console.log("make guardian article for " + searchTerm);
                   articleList.push(articleTemp);
                 });
@@ -107,6 +108,7 @@ var fetchFromNYT = function(searchTerm, success, error) {
               articleTemp.summary = article.snippet;
               articleTemp.source = article.source;
               articleTemp.twitter = "@nytimes";
+              articleTemp.keyword = searchTerm;
               console.log("make nytimes article for " + searchTerm);
               articleList.push(articleTemp);
             });
@@ -246,7 +248,7 @@ app.get('/login', routeMiddleware.preventLoginSignup, function(req,res){
 
 // authenticate users when logging in - no need for req,res passport does this for us
 app.post('/login', passport.authenticate('local', {
-  successRedirect: '/home',
+  successRedirect: '/search',
   failureRedirect: '/login',
   failureFlash: true
 }));
@@ -262,21 +264,23 @@ app.get('/logout', function(req,res){
 
 
 //DELETE
-// app.get('/keyword/:id', function(req,res){
-//   var keywordId = req.params.id;
+app.delete('/delete/keyword/:id', function(req,res){
+  var keywordId = req.params.id;
+  console.log(keywordId);
+  res.redirect('/search');
 
-//   db.Keyword.findAll({
-//     where: {
-//       id: keywordId
-//     }
-//   }).done(function(err, keyword, created){
-//     db.KeywordsUser.create({
-//       UserId: req.user.id,
-//       KeywordId: keyword.id
-//     }).done(function(err,result){
-//       res.render('')
-//     })
-//   });
+  // db.Keyword.findAll({
+  //   where: {
+  //     id: keywordId
+  //   }
+  // }).done(function(err, keyword, created){
+  //   db.KeywordsUser.create({
+  //     UserId: req.user.id,
+  //     KeywordId: keyword.id
+  //   }).done(function(err,result){
+  //     res.render('')
+  //   })
+  });
 
 
 // 404

@@ -42,5 +42,22 @@
       <% } %>
   </div>
 
+
+<% if (isAuthenticated) { %>
+  <div class="keyworddiv">
+    <% if (keywordList.length > 0) { %>
+        <% keywordList.forEach(function (keyword) { %>
+        <button type="button" class="btn btn-md">
+          <form method="post" action="/delete/keyword/<%= keyword.id %>?_method=delete"><button><span class="glyphicon glyphicon-remove removebtn"></span></button></form>
+
+
+          <span><a href="/search?keyword=<%= keyword.name %>"><%= keyword.name%></a></span>
+        </button>
+      <% }) %>
+    <% } %>
+  </div>
+<% } %>
+
+
 // articleTemp.imgurl = "https://nytimes.com/" + (article.multimedia[0].url);
 

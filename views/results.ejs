@@ -5,6 +5,14 @@
 <h1 class="masthead"> The Monitor </h1>
 <br> -->
 
+<% if (isAuthenticated) { %>
+<br>
+<br>
+<div>
+  ***CAVEAT*** <br> App not complete, new keywords are generated per search and currently cannot be deleted. Log out to search trial keywords. Please note that API has limited capacity.
+</div>
+<% } %>
+
 <p>
   <form action="/search" method="GET">
     <div class="form-group" >
@@ -15,18 +23,19 @@
 
 
 <% if (isAuthenticated) { %>
-  <div>
+  <div class="keyworddiv">
     <% if (keywordList.length > 0) { %>
-      <p>
         <% keywordList.forEach(function (keyword) { %>
-        <div class="btn keywordbtn">
-          <a href="/search?keyword=<%= keyword.name %>"><%= keyword.name %></a>
-        </div>
-        <% }) %>
-      <p>
+        <button type="button" class="btn btn-md">
+          <span class="glyphicon glyphicon-remove removebtn"></span>
+          <span><a href="/search?keyword=<%= keyword.name %>"><%= keyword.name%></a></span>
+        </button>
+      <% }) %>
     <% } %>
   </div>
 <% } %>
+
+
 
   <div id="container">
     <% if (articleList !== []) { %>
@@ -35,20 +44,25 @@
 
             <div class="articlediv">
 
-<!--               <a href="https://twitter.com/share"
+
+
+              <a href="<%= article.url %>"> <%=article.title%></a>
+                 <br> <%=article.date%> <br> <%= article.source %>
+
+                 <br><br>Keyword: <%= article.keyword %><br>
+                 <p>
+              <a href="https://twitter.com/share"
               class="twitter-share-button"
               data-counturl="<%= article.url %>"
-              data-count="vertical"
+              data-count="horizontal"
               data-text="<%= article.title %> by <%= article.twitter %>: <%= article.url %>"
               data-related="twitterdev:Twitter Developer Relations">
               Tweet
               </a>
               <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
-              </script><br> -->
-
-
-              <a href="<%= article.url %>"> <%=article.title%></a>
-                 <br> <%=article.date%> <br> <%= article.source %>
+              </script><br>
+              </p>
+                 <br>
 
             </div>
           <% }) %>
@@ -57,25 +71,25 @@
 
             <div class="articlediv">
 
-<!--               <a href="https://twitter.com/share"
-              class="twitter-share-button"
-              data-counturl="<%= article.url %>"
-              data-count="vertical"
-              data-text="<%= article.title %> by <%= article.twitter %>: <%= article.url %>"
-              data-related="twitterdev:Twitter Developer Relations">
-              Tweet
-              </a>
-              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
-              </script><br> -->
-
-
               <a href="<%= article.url %>"><%=article.title%></a>
               <br> <%=article.date%> <br> <%= article.source %>
 
               <% if (article.summary !== undefined) {%>
                 <p>"<%= article.summary %>"</p>
               <% } %>
-
+              <br><br>Keyword: <%= article.keyword %>
+                 <p>
+              <a href="https://twitter.com/share"
+              class="twitter-share-button"
+              data-counturl="<%= article.url %>"
+              data-count="horizontal"
+              data-text="<%= article.title %> by <%= article.twitter %>: <%= article.url %>"
+              data-related="twitterdev:Twitter Developer Relations">
+              Tweet
+              </a>
+              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+              </script><br>
+              </p>
             </div>
 
           <% })%>

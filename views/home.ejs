@@ -1,5 +1,14 @@
 <% include partials/header %>
 
+
+<% if (isAuthenticated) { %>
+<br>
+<br>
+<div>
+  ***CAVEAT*** <br> App not complete, new keywords are generated per search and currently cannot be deleted. Log out to search trial keywords. Please note that API has limited capacity.
+</div>
+<% } %>
+
 <br>
 <br>
   <p>
@@ -10,16 +19,18 @@
   </form>
   </p>
 
-  <% if (isAuthenticated) { %>
-  <div>
+<% if (isAuthenticated) { %>
+  <div class="keyworddiv">
     <% if (keywordList.length > 0) { %>
-      <p>
         <% keywordList.forEach(function (keyword) { %>
-          <a href="/search?keyword=<%= keyword.name %>" class="keywordbtn"><%= keyword.name %></a>
-        <% }) %>
-      <p>
+        <button type="button" class="btn btn-md">
+          <span class="glyphicon glyphicon-remove removebtn"></span>
+          <span><a href="/search?keyword=<%= keyword.name %>"><%= keyword.name%></a></span>
+        </button>
+      <% }) %>
     <% } %>
   </div>
 <% } %>
+
 
 <% include partials/footer %>

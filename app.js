@@ -189,6 +189,11 @@ app.get('/home', function(req, res){
   }
 });
 
+//ABOUT
+app.get('/about', function(req, res){
+    res.render('about');
+});
+
 //CREATE KEYWORD on SEARCH
 app.get('/search', function(req, res){
 
@@ -350,18 +355,24 @@ app.get('/create/keyword', function(req, res){
   }
 });
 
-
 //DELETE
 // app.delete('/delete/keyword/:id', function(req,res){
 //   var keywordId = req.params.id;
 //   console.log(keywordId);
-//   res.redirect('/search');
-
-//   // db.Keyword.findAll({
+//   // db.KeywordsUsers.findAll({
 //   //   where: {
-//   //     id: keywordId
+//   //     KeywordId: keywordId
 //   //   }
-//   // }).done(function(err, keyword, created){
+//   // }).done(function(err, keywordsusersId){
+          // keywordsusersId.destroy
+          //})
+        //db.Keywords.findAll({
+          //where:{}
+       // })
+
+//   res.redirect('/my/keywords');
+
+
 //   //   db.KeywordsUser.create({
 //   //     UserId: req.user.id,
 //   //     KeywordId: keyword.id

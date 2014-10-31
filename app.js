@@ -60,8 +60,9 @@ passport.deserializeUser(function(id, done){
 });
 
 
-//GLOBAL FUNCTIONS
+////////////GLOBAL FUNCTIONS/////////////
 
+//Fetch Results From Guardian API
 var fetchFromGuardian = function(searchTerm, success, error){
   var guardianUrl = "http://content.guardianapis.com/search?api-key=" + process.env.GUARDIAN_API + "&order-by=newest&q=" + searchTerm;
   var articleList = [];
@@ -84,6 +85,7 @@ var fetchFromGuardian = function(searchTerm, success, error){
       console.log("guardianResult length:" + guardianResult.length);
       console.log("articleList" + articleList);
       console.log("GUARDIAN SUCCESS");
+      //articleList is an array with [{guardian}, {articles}] that will be fed to fetchKeyword
       success(articleList);
     } else {
       console.log("ERROR WITH GUARDIAN", error);
@@ -92,6 +94,7 @@ var fetchFromGuardian = function(searchTerm, success, error){
   });//first request(the guardian)
 };
 
+//Fetch Results from NYT API
 var fetchFromNYT = function(searchTerm, success, error) {
   var nytimesUrl = "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=" + searchTerm + "&api-key=" + process.env.NYT_API;
   var articleList = [];
@@ -116,8 +119,7 @@ var fetchFromNYT = function(searchTerm, success, error) {
       console.log("nytimesResult length:" + nytimesResult.length);
       console.log("articleList" + articleList);
       console.log("NYTIMES SUCCESS");
-
-      //SORT articleList
+      //articleList is an array with [{guardian}, {articles}] that will be fed to fetchKeyword
       success(articleList);
     } else {
       console.log("ERROR WITH NYTIMES", error);
@@ -126,6 +128,7 @@ var fetchFromNYT = function(searchTerm, success, error) {
   });// request (the new york times)
 };
 
+//Fetch Keywords from Guardian and NYT using above functions
 var fetchKeyword = function (keyword, callback) {
   var searchTerm = keyword.name;
   var results = {keyword:searchTerm};
@@ -135,6 +138,7 @@ var fetchKeyword = function (keyword, callback) {
     results.guardian = guardianArticles;
     fetchFromNYT(searchTerm, function(nytArticles){
       results.nyt = nytArticles;
+      //results is an array with [keyword: "searchTerm", {guardian: [{articles}], nyt: {articles}]]
       callback(null, results);
     }, function(){
       console.log("NYT Error");
@@ -147,9 +151,15 @@ var fetchKeyword = function (keyword, callback) {
   });//Guardian
 };
 
+
+
+
+
+
+
 /////////ROUTES AND FUNCTIONS//////////
 
-//Home
+//INDEX
 app.get('/', function(req, res){
 
   if(req.user){
@@ -164,6 +174,7 @@ app.get('/', function(req, res){
   }
 });
 
+//HOME
 app.get('/home', function(req, res){
 
   if(req.user){
@@ -247,7 +258,7 @@ app.get('/login', routeMiddleware.preventLoginSignup, function(req,res){
 
 // authenticate users when logging in - no need for req,res passport does this for us
 app.post('/login', passport.authenticate('local', {
-  successRedirect: '/search',
+  successRedirect: '/home',
   failureRedirect: '/login',
   failureFlash: true
 }));
@@ -260,19 +271,28 @@ app.get('/logout', function(req,res){
 
 //////////////USER ROUTES/////////////
 //My Profile
+app.get('/my/profile', routeMiddleware.checkAuthentication, function(req,res){
+  res.render('my/profile', {user: req.user});
+});
 
 //My Report
-app.get('/my/report', routeMiddleware.checkAuthentication, function(req, res){
+app.get('/my/report', routeMiddleware.checkAuthentication, function(req,res){
 
   req.user.getKeywords().done(function(err, keywords){
     async.map(keywords, fetchKeyword, function(err, results){
-
       res.render('my/report', { articleList: results, user: req.user, keywordList: keywords});
     });
   });
 });
 
 //My Keywords
+app.get('/my/keywords', routeMiddleware.checkAuthentication, function(req,res){
+  req.user.getKeywords().done(function(err, keywords){
+    async.map(keywords, fetchKeyword, function(err, results){
+      res.render('my/keywords', { articleList: results, user: req.user, keywordList: keywords});
+    });
+  });
+});
 
 
 

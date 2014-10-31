@@ -1,1 +1,14 @@
-keywords.ejs
+<% include ../partials/header %>
+
+  <div class="keyworddiv">
+    <% if (keywordList.length > 0) { %>
+        <% keywordList.forEach(function (keyword) { %>
+        <button type="button" class="btn btn-md">
+          <a href="/delete"><span class="glyphicon glyphicon-remove removebtn"></span></a>
+          <span><a href="/search?keyword=<%= keyword.name %>"><%= keyword.name%></a></span>
+        </button>
+      <% }) %>
+    <% } %>
+  </div>
+
+<% include ../partials/footer %>

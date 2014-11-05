@@ -1,7 +1,7 @@
 <% include ../partials/header %>
 
 <br>
-<h1 class="masthead"> MY REPORT </h1>
+<h1 class="masthead"> My Report </h1>
 <br>
 
 <br>
@@ -14,7 +14,7 @@
   <div class="keyworddiv">
     <% if (keywordList.length > 0) { %>
         <% keywordList.forEach(function (keyword) { %>
-          <span><a href="/show/?<%= keyword.name %>">|   <%= keyword.name%>   |</a></span>
+          <span><a href="/search/?keyword=<%= keyword.name %>">|   <%= keyword.name%>   |</a></span>
       <% }) %>
       <% } %>
       <button><a href="/my/keywords">EDIT MY KEYWORDS</a></button>

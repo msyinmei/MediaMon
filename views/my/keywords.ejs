@@ -1,9 +1,9 @@
 <% include ../partials/header %>
-
+<br>
 <h1 class="masthead">My Keywords</h1>
-
+<br>
 <div class="instructions">
-  please note that no delete capability has been developed yet. add wisely
+Manage your keywords here. Type to add. Click to remove.
 </div>
 
   <p>
@@ -17,10 +17,9 @@
   <div class="keyworddiv">
     <% if (keywordList.length > 0) { %>
         <% keywordList.forEach(function (keyword) { %>
-        <button type="button" class="btn btn-md">
-          <a href="/delete/keyword/<%= keyword.id %>"><span class="glyphicon glyphicon-remove removebtn"></span></a>
-          <span><a href="/search?keyword=<%= keyword.name %>"><%= keyword.name %></a></span>
-        </button>
+          <form action="/delete/keyword/<%= keyword.id %>?_method=delete" method="post">
+            <input type="submit" value="Remove keyword: <%= keyword.name %>">
+          </form>
       <% }) %>
     <% } %>
   </div>

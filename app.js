@@ -279,11 +279,9 @@ app.get('/my/report', routeMiddleware.checkAuthentication, function(req,res){
 //My Keywords
 app.get('/my/keywords', routeMiddleware.checkAuthentication, function(req,res){
   req.user.getKeywords().done(function(err, keywords){
-    async.map(keywords, fetchKeyword, function(err, results){
-      res.render('my/keywords', { articleList: results, user: req.user, keywordList: keywords});
+      res.render('my/keywords', { user: req.user, keywordList: keywords});
     });
   });
-});
 
 //Add Keyword
 app.get('/addkeyword/:keyword', function(req, res){
@@ -347,31 +345,24 @@ app.get('/create/keyword', function(req, res){
   }
 });
 
-//DELETE
-// app.delete('/delete/keyword/:id', function(req,res){
-//   var keywordId = req.params.id;
-//   console.log(keywordId);
-//   // db.KeywordsUsers.findAll({
-//   //   where: {
-//   //     KeywordId: keywordId
-//   //   }
-//   // }).done(function(err, keywordsusersId){
-          // keywordsusersId.destroy
-          //})
-        //db.Keywords.findAll({
-          //where:{}
-       // })
-
-//   res.redirect('/my/keywords');
-
-
-//   //   db.KeywordsUser.create({
-//   //     UserId: req.user.id,
-//   //     KeywordId: keyword.id
-//   //   }).done(function(err,result){
-//   //     res.render('')
-//   //   })
-//   });
+// DELETE
+app.delete('/delete/keyword/:id', function(req,res){
+  var keywordId = req.params.id;
+  var userId = req.user.id;
+  db.Keyword.find(keywordId).done(function(err,foundKeyword){
+    console.log("THIS IS THE FOUND KEYWORD!!!:" + foundKeyword.name);
+    req.user.removeKeyword(foundKeyword).done(function(err, something){
+      foundKeyword.getUsers().done(function(err, users){
+        console.log("THESE ARE THE USERS OF THE KEYWORD " +foundKeyword.name +":" + users);
+        if (users.length === 0){
+          foundKeyword.destroy();
+          console.log("THIS KEYWORD IS DESTROYED" + foundKeyword.name);
+        }
+      });
+      res.redirect('/my/keywords');
+    });
+  });
+});
 
 // 404
 app.get('*', function(req, res){
